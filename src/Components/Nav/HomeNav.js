@@ -9,7 +9,7 @@ function HomeNav () {
               <div class="row align-items-center">
                 
                 <div class="col-6 col-md-3 col-xl-4  d-block">
-                  <h1 class="mb-0 site-logo"><a href="/" class="text-black h2 mb-0">ContentRewriter<span class="text-primary">.</span> </a></h1>
+                  <h1 class="mb-0 site-logo"><a href="/home" class="text-black h2 mb-0">ContentRewriter<span class="text-primary">.</span> </a></h1>
                 </div>
       
                 <div class="col-12 col-md-9 col-xl-8 main-menu">

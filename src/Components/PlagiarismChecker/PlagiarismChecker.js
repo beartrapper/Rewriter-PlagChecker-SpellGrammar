@@ -3,6 +3,8 @@ import { auth, firestore } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
+import ReCAPTCHA from "react-google-recaptcha";
+import MobileHomeNAv from "../Nav/MobileHomeNav";
 
 function PlagiarismChecker() {
   const [userStatus, setUserStatus] = useState(null);
@@ -19,6 +21,10 @@ function PlagiarismChecker() {
   const [userInfo, setUserInfo] = useState(0);
   const [fetchedFirestore, setFetchedFirestore] = useState(false);
   const [countCredits, setCountCredits] = useState(0);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [pageLoading, setPageLoading] = useState(true);
+
+
 
 
   useEffect(() => {
@@ -42,46 +48,21 @@ function PlagiarismChecker() {
             setUserInfo(doc.data());
             setCountCredits(doc.data().credits)
           }
+      setPageLoading(false)
+
         })
         setUserStatus(user);
       }
     });
   }, [userStatus]);
 
-  // const handleRewrite = async e => {
-  //   e.preventDefault();
-  //   let ignoredToBeSent = [];
-  //   let tempValue;
-  //   if (wordsLength < 10000) {
-  //     for (let count = 0; count < uniqueness; count++) {
-  //       if (count != 0) {
-  //         await axios({
-  //           method: "post", //you can set what request you want to be
-  //           url: "http://localhost:5000/api/rewrite",
-  //           data: { body: tempValue, words: ignoreWords, spellCheck }
-  //         })
-  //           .then(res => {
-  //             console.log(res.data);
-  //             tempValue = res.data;
-  //             setUpdatedValue(res.data);
-  //           })
-  //           .catch(err => console.log(err));
-  //       } else {
-  //         await axios({
-  //           method: "post", //you can set what request you want to be
-  //           url: "http://localhost:5000/api/rewrite",
-  //           data: { body: value, words: ignoreWords, spellCheck }
-  //         })
-  //           .then(res => {
-  //             console.log(res.data);
-  //             tempValue = res.data;
-  //             setUpdatedValue(res.data);
-  //           })
-  //           .catch(err => console.log(err));
-  //       }
-  //     }
-  //   }
-  // };
+
+
+
+  function onChange(value) {
+    console.log("Captcha value:", value);
+  }
+
 
   const handlePlagiarism = () => {
     
@@ -151,15 +132,30 @@ function PlagiarismChecker() {
   const handleLogout = e => {
     auth.signOut();
   };
+  console.log(width)
 
   return (
     <>
-      {redirect ? (
+
+
+
+{pageLoading ? <>
+
+  <div class="loadingio-spinner-rolling-bp0uc8kphr6"><div class="ldio-v9q6rtgt8o">
+<div></div>
+</div></div>
+
+</>:<>
+{redirect ? (
         <Redirect to="/signin" />
       ) : (
         <>
+        {width > 500 ?
             <HomeNav />
-          <div className="form-group container container-width">
+:
+<MobileHomeNAv />
+}
+          <div className={"form-group container container-width" + (width < 500 ? " bg-primary" : "")}>
             <div className="row">
           <div className="col col-sm-12">
 
@@ -208,6 +204,13 @@ className={
 }
 
   </button>
+  {/* <div class="ml-5 pl-5 text-center">
+  <ReCAPTCHA
+    sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
+    onChange={onChange}
+  />
+  </div> */}
+
 </div>
 <br />
 <br />
@@ -215,11 +218,13 @@ className={
 <br />
 
 
-{plagiarismPlaces.plagPercent == "0" ? 
+{
+plagiarismPlaces.plagPercent == "0" ? 
   <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">No Plagiarism found </div>
 
 :<></>}
-{checked && plagiarismPlaces.plagPercent != "0"? <>
+{
+checked && plagiarismPlaces.plagPercent != "0"? <>
   <div class="row">
   <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">Plagiarism Detected </div>
   <div className="col col-lg-2 bg-warning text-center text-dark p-3">{plagiarismPlaces.plagPercent}% </div>
@@ -266,6 +271,11 @@ className={
         </>
 
       )}
+</> }
+
+
+
+ 
     </>
   );
 }

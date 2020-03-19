@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../../firebase";
+import { auth, firestore } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
+import MobileHomeNAv from "../Nav/MobileHomeNav";
+
 
 function Rewiter() {
   const [userStatus, setUserStatus] = useState(null);
@@ -13,27 +15,60 @@ function Rewiter() {
   const [uniqueness, setUniqueness] = useState(1);
   const [ignoreWords, setIgnoreWords] = useState("aforementioned");
   const [spellCheck, setSpellCheck] = useState(false);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [done, setDone] = useState(false);
+  const [userInfo, setUserInfo] = useState(0);
+  const [fetchedFirestore, setFetchedFirestore] = useState(false);
+  const [countCredits, setCountCredits] = useState(0);
+  const [checked, setChecked] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
 
   useEffect(() => {
+
     auth.onAuthStateChanged(user => {
       if (user == null) {
         setRedirect(true);
         setUserStatus(user);
-      } else setUserStatus(user);
+   
+      } else {
+        console.log(user.uid)
+        firestore
+        .collection('users')
+        .doc(user.uid)
+        .get()
+        .then(doc => {
+          if(!doc.exists){
+            console.log('no such doc')
+          } else {
+            console.log(doc.data())
+            setFetchedFirestore(true)
+            setUserInfo(doc.data());
+            setCountCredits(doc.data().credits)
+          }
+          setPageLoading(false);
+        })
+        setUserStatus(user);
+      }
     });
   }, [userStatus]);
 
+
+
   const handleRewrite = async e => {
     e.preventDefault();
+    setChecking(true);
+
     let ignoredToBeSent = [];
     let tempValue;
-    if (wordsLength < 10000) {
+    if (wordsLength < 5000) {
       for (let count = 0; count < uniqueness; count++) {
         if (count != 0) {
           await axios({
             method: "post", //you can set what request you want to be
             url: "http://localhost:5000/api/rewrite",
-            data: { body: tempValue, words: ignoreWords, spellCheck }
+            data: { value: tempValue, words: ignoreWords}
           })
             .then(res => {
               console.log(res.data);
@@ -45,16 +80,38 @@ function Rewiter() {
           await axios({
             method: "post", //you can set what request you want to be
             url: "http://localhost:5000/api/rewrite",
-            data: { body: value, words: ignoreWords, spellCheck }
+            data: { value: value, words: ignoreWords }
           })
             .then(res => {
               console.log(res.data);
               tempValue = res.data;
               setUpdatedValue(res.data);
+              
             })
             .catch(err => console.log(err));
         }
       }
+
+      setCountCredits(countCredits - 1)
+      firestore
+      .collection('users')
+      .doc(userStatus.uid)
+      .set({
+        credits: userInfo.credits - 1
+      })
+      .then(respo => {
+        // res.data.sources.map(item => {
+          setValue(tempValue)
+          setDone(true);
+          
+  
+      });
+      setChecking(false);
+
+
+
+
+  
     }
   };
 
@@ -101,72 +158,25 @@ function Rewiter() {
 
   return (
     <>
-      {redirect ? (
+
+
+{pageLoading ? 
+<>
+<div class="loadingio-spinner-rolling-bp0uc8kphr6"><div class="ldio-v9q6rtgt8o">
+<div></div>
+</div></div>
+</>:<>
+
+{redirect ? (
         <Redirect to="/signin" />
       ) : (
         <>
-          {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <a className="navbar-brand" href="#">
-              Content Rewriter
-            </a>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-
-            <div
-              className="collapse navbar-collapse"
-              id="navbarSupportedContent"
-            >
-              <ul className="navbar-nav ml-auto">
-                <li className="nav-item dropdown mr-5">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#"
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <img
-                      src="https://www.w3schools.com/howto/img_avatar.png"
-                      alt="Avatar"
-                      className="avatar"
-                    />
-                  </a>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    <a className="dropdown-item" href="#">
-                      Action
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Another action
-                    </a>
-                    <div className="dropdown-divider"></div>
-                    <a
-                      onClick={handleLogout}
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      Logout
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </nav>
-           */}
+      
+         {width > 500 ?
             <HomeNav />
+:
+<MobileHomeNAv />
+}
  
           {/* <div className="background-home" >
           </div> */} 
@@ -178,7 +188,7 @@ function Rewiter() {
             <div>
             <div className="tag-saucy">
             
-            <p className={wordsLength > 10000 ? "text-danger" : ""}>
+            <p className={wordsLength > 5000 ? "text-danger" : ""}>
               Characters: {wordsLength}
             </p>
           </div>
@@ -186,6 +196,7 @@ function Rewiter() {
           </div>
           <div className="position-style">
             <textarea
+              value={value}
               onChange={handleChange}
               className="form-control position-change"
               rows="15"
@@ -211,13 +222,19 @@ function Rewiter() {
 onClick={handleRewrite}
 className={
   "btn btn-lg col-sm-4 p-3 mt-1 rounded-5 " +
-  (wordsLength > 10000 ? "btn-danger" : "btn-primary")
+  (wordsLength > 5000 || checking ? "btn-danger disabled" : "btn-primary")
 }
 >
-{wordsLength > 10000 ? <>Reduce Chars</> : <>Check</>}
-  </button>
+{
+    countCredits == 0 ? <>
+    Kindly add more credits
+    </>: <>
+    {wordsLength > 5000 ? <>Reduce Chars To 5000</> : <>{checking ? <>Please Wait</>:<>Check  - {countCredits}   </>}</>} 
+    </>
+}
+</button>
 </div>
-<div className="container pt-5">
+  <div className="container pt-5">
 
             <div  className="row">
             <div className="col col-sm-4">
@@ -263,7 +280,7 @@ className={
           <br />
           <br />
           <br />
-          <div className="form-group">
+          {/* <div className="form-group">
             <label for="comment">Cleansed:</label>
             <textarea
               value={updatedValue}
@@ -272,10 +289,16 @@ className={
               id="comment"
             ></textarea>
           </div>
-          <button onClick={handlePlagiarism} className="btn btn-primary">click</button>
+          <button onClick={handlePlagiarism} className="btn btn-primary">click</button> */}
 
         </>
       )}
+
+
+</>}
+
+
+ 
     </>
   );
 }

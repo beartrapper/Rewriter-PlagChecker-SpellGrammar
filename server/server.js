@@ -4,19 +4,18 @@ const bodyparser = require("body-parser");
 const spinBotAPIkey = require("./config").spinBotAPIkey;
 const app = express();
 const axios = require("axios");
-const Grammarbot = require("grammarbot");
-const plagiarism = require('plagiarism');
-var request = require('request');
+// const Grammarbot = require("grammarbot");
+// const plagiarism = require('plagiarism');
+// var request = require('request');
 var curl = require('curlrequest');
-var beautify = require("json-beautify");
+// var beautify = require("json-beautify");
 
-const bot = new Grammarbot({
-  api_key: "KS9C5N3Y", // (Optional) defaults to node_default
-  language: "en-US", // (Optional) defaults to en-US
-  base_uri: "api.grammarbot.io" // (Optional) defaul    ts to api.grammarbot.io
-});
-
-
+// const bot = new Grammarbot({
+//   api_key: "KS9C5N3Y", // (Optional) defaults to node_default
+//   language: "en-US", // (Optional) defaults to en-US
+//   base_uri: "api.grammarbot.io" // (Optional) defaul    ts to api.grammarbot.io
+// });
+const path = require("path")
 
 //middlewares
 app.use(cors());
@@ -28,7 +27,7 @@ app.post("/api/rewrite", async (req, res) => {
   await axios({
     method: "post", //you can set what request you want to be
     url: "https://api.spinbot.com/",
-    data: req.body.body,
+    data: req.body.value,
     headers: {
       "x-auth-key": spinBotAPIkey,
       "x-words-to-skip": req.body.words
@@ -36,14 +35,6 @@ app.post("/api/rewrite", async (req, res) => {
   })
     .then(async resp => {
       res.json(resp.data);
-      // if (req.body.spellCheck)
-      //   await axios
-      //     .post("http://localhost:5000/api/spell", resp.data)
-      //     .then(response => {
-      //       res.json(response.data);
-      //     })
-      //     .catch(err => console.log(err));
-      // else res.json(resp.data);
     })
     .catch(err => console.log(err));
 });
@@ -110,6 +101,49 @@ curl.request({ url: 'https://www.prepostseo.com/apis/checkPlag', method: 'POST',
   // });
 
 })
+
+// app.post("/api/mulitple", (req, res) => {
+ 
+//  let valueAccrossAll = null;
+//   if(req.body.rewriter){
+//     const obj = {
+//       body: req.body.value
+//     }
+//     axios.post('/api/rewrite')
+//       .then(response => {
+//         valueAccrossAll = response.data;
+//       })
+//       .catch(err => res.json({"message": err}))
+//   }
+//   if(req.body.spellCheck){
+//     const obj2 = {
+//       value: () => {
+//         if(valueAccrossAll != null)
+//           return valueAccrossAll;
+//         else
+//           return req.body.value;
+//       }
+//     }
+//     axios.post('/api/spell', obj2)
+//       .then(responsive => {
+
+//       })
+//   }
+// })
+
+
+// Serve static assets in production
+
+  // Set static folder
+  app.use(express.static('../build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname,'..', 'build', 'index.html'));
+  });
+
+
+
+
 const port = 5000;
 
 app.listen(port, () => {

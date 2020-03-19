@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../../firebase";
+import { auth, firestore } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
@@ -13,24 +13,72 @@ function SpellingAndGrammar() {
   const [uniqueness, setUniqueness] = useState(1);
   const [ignoreWords, setIgnoreWords] = useState("aforementioned");
   const [spellCheck, setSpellCheck] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [userInfo, setUserInfo] = useState(0);
+  const [fetchedFirestore, setFetchedFirestore] = useState(false);
+  const [countCredits, setCountCredits] = useState(0);
+  const [width, setWidth] = useState(window.innerWidth);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {
       if (user == null) {
         setRedirect(true);
         setUserStatus(user);
-      } else setUserStatus(user);
+   
+      } else {
+        console.log(user.uid)
+        firestore
+        .collection('users')
+        .doc(user.uid)
+        .get()
+        .then(doc => {
+          if(!doc.exists){
+            console.log('no such doc')
+          } else {
+            console.log(doc.data())
+            setFetchedFirestore(true)
+            setUserInfo(doc.data());
+            setCountCredits(doc.data().credits)
+          }
+      setPageLoading(false)
+
+        })
+        setUserStatus(user);
+      }
     });
   }, [userStatus]);
 
   const onSubmit = async e => {
     e.preventDefault();
+    setChecking(true);
+
     const obj = {
       value
     };
     axios.post('http://localhost:5000/api/spell', obj)
       .then(res => {
         console.log(res.data);
+
+
+        firestore
+        .collection('users')
+        .doc(userStatus.uid)
+        .set({
+          credits: userInfo.credits - 1
+        })
+        .then(respo => {
+          // res.data.sources.map(item => {
+            setValue(res.data)
+            setChecked(true);
+            setCountCredits(countCredits - 1)
+        setChecking(false);
+          
+    
+        })
+
+
       })
       .catch(err => {
         console.log(err);
@@ -81,71 +129,18 @@ function SpellingAndGrammar() {
 
   return (
     <>
-      {redirect ? (
+
+{pageLoading ? 
+<>
+<div class="loadingio-spinner-rolling-bp0uc8kphr6"><div class="ldio-v9q6rtgt8o">
+<div></div>
+</div></div>
+</>:<>
+{redirect ? (
         <Redirect to="/signin" />
       ) : (
         <>
-          {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <a className="navbar-brand" href="#">
-              Content Rewriter
-            </a>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-
-            <div
-              className="collapse navbar-collapse"
-              id="navbarSupportedContent"
-            >
-              <ul className="navbar-nav ml-auto">
-                <li className="nav-item dropdown mr-5">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#"
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <img
-                      src="https://www.w3schools.com/howto/img_avatar.png"
-                      alt="Avatar"
-                      className="avatar"
-                    />
-                  </a>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    <a className="dropdown-item" href="#">
-                      Action
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Another action
-                    </a>
-                    <div className="dropdown-divider"></div>
-                    <a
-                      onClick={handleLogout}
-                      className="dropdown-item"
-                      href="#"
-                    >
-                      Logout
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </nav>
-           */}
+        
             <HomeNav />
  
           {/* <div className="background-home" >
@@ -166,6 +161,7 @@ function SpellingAndGrammar() {
           </div>
           <div className="position-style">
             <textarea
+              value={value}
               onChange={handleChange}
               className="form-control position-change"
               rows="15"
@@ -180,21 +176,22 @@ function SpellingAndGrammar() {
           </div>
 
 
-{/* <div className="container">
-<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Rewiter</button>
-<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Plagiarism</button>
-<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Spelling and Grammar</button>
-</div> */}
 <div className="container text-center font-color">
   <button 
 
 onClick={onSubmit}
 className={
   "btn btn-lg col-sm-4 p-3 mt-1 rounded-5 " +
-  (wordsLength > 10000 ? "btn-danger" : "btn-primary")
+  (wordsLength > 5000 || checking ? "btn-danger disabled" : "btn-primary")
 }
 >
-{wordsLength > 10000 ? <>Reduce Chars</> : <>Check</>}
+{
+    countCredits == 0 ? <>
+    Kindly add more credits
+    </>: <>
+    {wordsLength > 5000 ? <>Reduce Chars To 5000</> : <>{checking ? <>Please Wait</>:<>Check  - {countCredits}   </>}</>} 
+    </>
+}
   </button>
 </div>
             
@@ -204,19 +201,15 @@ className={
           <br />
           <br />
           <br />
-          <div className="form-group">
-            <label for="comment">Cleansed:</label>
-            <textarea
-              value={updatedValue}
-              className="form-control"
-              rows="10"
-              id="comment"
-            ></textarea>
-          </div>
-          <button onClick={handlePlagiarism} className="btn btn-primary">click</button>
+     
 
         </>
       )}
+
+</>}
+
+
+  
     </>
   );
 }
