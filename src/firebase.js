@@ -3,16 +3,17 @@ import "firebase/firestore";
 import "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD0my9sWgU-Th6zME5y1dDMGYGV281yvlI",
-  authDomain: "automationsmm.firebaseapp.com",
-  databaseURL: "https://automationsmm.firebaseio.com",
-  projectId: "automationsmm",
-  storageBucket: "automationsmm.appspot.com",
-  messagingSenderId: "247795926680",
-  appId: "1:247795926680:web:571c65c43cedaa7a9872ed",
-  measurementId: "G-3ZESS45C3V"
+  apiKey: "AIzaSyCablANLK4qaX_YT_-yFaNAX46F9ENzqJg",
+  authDomain: "article-rewriter-156e1.firebaseapp.com",
+  databaseURL: "https://article-rewriter-156e1.firebaseio.com",
+  projectId: "article-rewriter-156e1",
+  storageBucket: "article-rewriter-156e1.appspot.com",
+  messagingSenderId: "643104054808",
+  appId: "1:643104054808:web:c4c7f781ecfcfe16172d6d",
+  measurementId: "G-1GSV8FMTW2"
 };
 
 firebase.initializeApp(firebaseConfig);
 export const auth = firebase.auth();
+export const firestore = firebase.firestore();
 export default firebase;

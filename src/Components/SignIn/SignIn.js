@@ -8,6 +8,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [err, setErr] = useState(false);
+  const [checkLoading, setCheckLoading] = useState(false);
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {
@@ -20,22 +21,27 @@ function SignIn() {
 
   const handleEmail = e => {
     e.preventDefault();
+    setErr(false);
     setEmail(e.target.value);
   };
 
   const handlePassword = e => {
     e.preventDefault();
+    setErr(false);
     setPassword(e.target.value);
   };
 
   const handleSubmit = e => {
     e.preventDefault();
+    setCheckLoading(true)
     auth
       .signInWithEmailAndPassword(email, password)
       .then(res => {
+        setCheckLoading(false)
         // console.log(res.M.code);
       })
       .catch(err => {
+        setCheckLoading(false)
         setErr(true);
       });
   };
@@ -43,7 +49,7 @@ function SignIn() {
   return (
     <>
       {redirect ? (
-        <Redirect to="/" />
+        <Redirect to="/home" />
       ) : (
         <>
           <div className="body">
@@ -66,10 +72,12 @@ function SignIn() {
                     onChange={handlePassword}
                   />
                   <button className="login" onClick={handleSubmit}>
-                    Login
+                    {checkLoading ? <>
+                      Checking..
+                    </>:<>Login</>}
                   </button>
                   {err ? (
-                    <div className="alert alert-danger">
+                    <div className="alert alert-danger pb-2">
                       Sorry, Wrong Credentials :(
                     </div>
                   ) : (

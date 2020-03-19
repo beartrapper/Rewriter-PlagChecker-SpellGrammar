@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
+import HomeNav from "../Nav/HomeNav";
 
 function Home() {
   const [userStatus, setUserStatus] = useState(null);
@@ -57,6 +58,13 @@ function Home() {
     }
   };
 
+  const handlePlagiarism = () => {
+    const obj = {
+      text: updatedValue
+    }
+    axios.post('http://localhost:5000/api/plagiarism', obj).catch(err => console.log(err));
+  }
+
   const handleChange = e => {
     e.preventDefault();
     setValue(e.target.value);
@@ -97,7 +105,7 @@ function Home() {
         <Redirect to="/signin" />
       ) : (
         <>
-          <nav className="navbar navbar-expand-lg navbar-light bg-light">
+          {/* <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <a className="navbar-brand" href="#">
               Content Rewriter
             </a>
@@ -157,31 +165,60 @@ function Home() {
               </ul>
             </div>
           </nav>
-          <div className="form-group">
-            <label for="text">Original:</label>{" "}
+           */}
+            <HomeNav />
+ 
+          {/* <div className="background-home" >
+          </div> */} 
+
+          <div className="form-group container container-width">
+            <div className="row">
+<div className="col col-sm-12">
+
+            <div>
+            <div className="tag-saucy">
+            
             <p className={wordsLength > 10000 ? "text-danger" : ""}>
               Characters: {wordsLength}
             </p>
+          </div>
+        
+          </div>
+          <div className="position-style">
             <textarea
               onChange={handleChange}
-              className="form-control"
-              rows="10"
+              className="form-control position-change"
+              rows="15"
               id="text"
             ></textarea>
-          </div>
-          <div className="row">
-            <div className="col col-sm-2">
-              <button
-                onClick={handleRewrite}
-                className={
-                  "btn btn-lg ml-5 " +
-                  (wordsLength > 10000 ? "btn-danger" : "btn-primary")
-                }
-              >
-                {wordsLength > 10000 ? <>Reduce Chars</> : <>Check</>}
-              </button>
             </div>
-            <div className="col col-sm-2">
+    
+        
+            </div>
+    
+          </div>
+          </div>
+
+
+<div className="container">
+<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Rewiter</button>
+<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Plagiarism</button>
+<button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Spelling and Grammar</button>
+</div>
+<div className="container text-center font-color">
+  <button 
+
+onClick={handleRewrite}
+className={
+  "btn btn-lg col-sm-4 p-3 mt-1 rounded-5 " +
+  (wordsLength > 10000 ? "btn-danger" : "btn-primary")
+}
+>
+{wordsLength > 10000 ? <>Reduce Chars</> : <>Check</>}
+  </button>
+</div>
+<div className="container pt-5">
+{/* <div className="col col-sm-2">
               <div className="selectt">
                 <select
                   onChange={handleUniqueness}
@@ -197,7 +234,8 @@ function Home() {
                   <option value="3">90%</option>
                 </select>
               </div>
-            </div>
+            </div> */}
+            <div  className="row">
             <div className="col col-sm-4">
               <div class="form-group row">
                 <input
@@ -213,27 +251,37 @@ function Home() {
                 </small>
               </div>
             </div>
+        
             <div className="col col-sm-2">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value=""
-                  id="defaultCheck1"
-                  onClick={handleSpellCheck}
-                />
-                <label class="form-check-label" for="defaultCheck1">
-                  Spell Check
-                </label>
+              <div className="selectt ml-5">
+                <select
+                  onChange={handleUniqueness}
+                  name="slct"
+                  id="slct"
+                  className="select"
+                >
+                  <option selected disabled>
+                    Uniqueness
+                  </option>
+                  <option value="1">70%</option>
+                  <option value="2">80%</option>
+                  <option value="3">90%</option>
+                </select>
               </div>
-
-              <br></br>
             </div>
-          </div>
+            </div>
+            </div>
+            
+            
+
+
           <br />
           <br />
           <br />
           <br />
+          <div class="loadingio-spinner-rolling-bp0uc8kphr6"><div class="ldio-v9q6rtgt8o">
+<div></div>
+</div></div>
           <div className="form-group">
             <label for="comment">Cleansed:</label>
             <textarea
@@ -243,6 +291,8 @@ function Home() {
               id="comment"
             ></textarea>
           </div>
+          <button onClick={handlePlagiarism} className="btn btn-primary">click</button>
+
         </>
       )}
     </>
