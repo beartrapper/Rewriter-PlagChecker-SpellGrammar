@@ -66,7 +66,7 @@ function Home() {
     if (toggleRewriter) {
       console.log("working");
       await axios
-        .post("http://localhost:5000/api/rewrite", obj)
+        .post("http://64.227.39.217:5000/api/rewrite", obj)
         .then(res => {
           obj.value = res.data;
 
@@ -87,7 +87,7 @@ function Home() {
 
     if (toggleSpell) {
       await axios
-        .post("http://localhost:5000/api/spell", obj)
+        .post("http://64.227.39.217:5000/api/spell", obj)
         .then(res => {
           obj.value = res.data;
           firestore
@@ -105,7 +105,7 @@ function Home() {
 
     if (togglePlag) {
       await axios
-        .post("http://localhost:5000/api/plagiarism", obj)
+        .post("http://64.227.39.217:5000/api/plagiarism", obj)
         .then(res => {
           firestore
             .collection("users")
