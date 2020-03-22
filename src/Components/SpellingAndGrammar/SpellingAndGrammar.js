@@ -64,7 +64,7 @@ function SpellingAndGrammar() {
     const obj = {
       value
     };
-    axios.post('http://64.227.39.217:5000/api/spell', obj)
+    axios.post('/api/spell', obj)
       .then(res => {
         console.log(res.data);
 
@@ -97,7 +97,7 @@ function SpellingAndGrammar() {
     const obj = {
       text: updatedValue
     }
-    axios.post('http://64.227.39.217:5000/api/plagiarism', obj).catch(err => console.log(err));
+    axios.post('/api/plagiarism', obj).catch(err => console.log(err));
   }
 
   const handleChange = e => {

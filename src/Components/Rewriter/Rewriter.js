@@ -68,7 +68,7 @@ function Rewiter() {
         if (count != 0) {
           await axios({
             method: "post", //you can set what request you want to be
-            url: "http://64.227.39.217:5000/api/rewrite",
+            url: "/api/rewrite",
             data: { value: tempValue, words: ignoreWords}
           })
             .then(res => {
@@ -80,7 +80,7 @@ function Rewiter() {
         } else {
           await axios({
             method: "post", //you can set what request you want to be
-            url: "http://64.227.39.217:5000/api/rewrite",
+            url: "/api/rewrite",
             data: { value: value, words: ignoreWords }
           })
             .then(res => {
@@ -120,7 +120,7 @@ function Rewiter() {
     const obj = {
       text: updatedValue
     }
-    axios.post('http://64.227.39.217:5000/api/plagiarism', obj).catch(err => console.log(err));
+    axios.post('/api/plagiarism', obj).catch(err => console.log(err));
   }
 
   const handleChange = e => {
