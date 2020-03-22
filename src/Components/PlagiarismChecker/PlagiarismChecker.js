@@ -70,7 +70,7 @@ function PlagiarismChecker() {
     const obj = {
       value
     };
-    axios.post('/api/plagiarism', obj)
+    axios.post('https://contentrewriter.com:5000/api/plagiarism', obj)
     .then(res => {
       firestore
       .collection('users')

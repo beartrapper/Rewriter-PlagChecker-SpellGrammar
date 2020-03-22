@@ -66,7 +66,7 @@ function Home() {
     if (toggleRewriter) {
       console.log("working");
       await axios
-        .post("/api/rewrite", obj)
+        .post("https://contentrewriter.com/api/rewrite", obj)
         .then(res => {
           obj.value = res.data;
 
@@ -87,7 +87,7 @@ function Home() {
 
     if (toggleSpell) {
       await axios
-        .post("/api/spell", obj)
+        .post("https://contentrewriter.com/api/spell", obj)
         .then(res => {
           obj.value = res.data;
           firestore
@@ -105,7 +105,7 @@ function Home() {
 
     if (togglePlag) {
       await axios
-        .post("/api/plagiarism", obj)
+        .post("https://contentrewriter.com/api/plagiarism", obj)
         .then(res => {
           firestore
             .collection("users")
