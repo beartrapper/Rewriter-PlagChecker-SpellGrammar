@@ -3,6 +3,8 @@ import { auth, firestore } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
+import MobileHomeNAv from "../Nav/MobileHomeNav";
+import ReCAPTCHA from "react-google-recaptcha";
 
 function Home() {
   const [userStatus, setUserStatus] = useState(null);
@@ -25,36 +27,32 @@ function Home() {
   const [width, setWidth] = useState(window.innerWidth);
   const [pageLoading, setPageLoading] = useState(true);
 
-
   useEffect(() => {
     auth.onAuthStateChanged(user => {
       if (user == null) {
         setRedirect(true);
         setUserStatus(user);
-   
       } else {
-        console.log(user.uid)
+        console.log(user.uid);
         firestore
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then(doc => {
-          if(!doc.exists){
-            console.log('no such doc')
-          } else {
-            console.log(doc.data())
-            setFetchedFirestore(true)
-            setUserInfo(doc.data());
-            setCountCredits(doc.data().credits)
-          }
-      setPageLoading(false)
-
-        })
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then(doc => {
+            if (!doc.exists) {
+              console.log("no such doc");
+            } else {
+              console.log(doc.data());
+              setFetchedFirestore(true);
+              setUserInfo(doc.data());
+              setCountCredits(doc.data().credits);
+            }
+            setPageLoading(false);
+          });
         setUserStatus(user);
       }
     });
   }, [userStatus]);
-
 
   const handleSubmit = async e => {
     setChecking(true);
@@ -65,75 +63,70 @@ function Home() {
       words: ignoreWords
     };
 
-    if(toggleRewriter){
-      console.log('working')
-      await axios.post('http://localhost:5000/api/rewrite', obj)
+    if (toggleRewriter) {
+      console.log("working");
+      await axios
+        .post("http://localhost:5000/api/rewrite", obj)
         .then(res => {
           obj.value = res.data;
 
           firestore
-          .collection('users')
-          .doc(userStatus.uid)
-          .set({
-            credits: userInfo.credits - 1
-          })
-          .then(respo => {
-            checker++;
-      
-          })
+            .collection("users")
+            .doc(userStatus.uid)
+            .set({
+              credits: userInfo.credits - 1
+            })
+            .then(respo => {
+              checker++;
+            });
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err));
     }
 
-console.log('its still runnning');
+    console.log("its still runnning");
 
-    if(toggleSpell){
-      
-      await axios.post('http://localhost:5000/api/spell', obj)
+    if (toggleSpell) {
+      await axios
+        .post("http://localhost:5000/api/spell", obj)
         .then(res => {
           obj.value = res.data;
           firestore
-          .collection('users')
-          .doc(userStatus.uid)
-          .set({
-            credits: userInfo.credits - 1
-          })
-          .then(respo => {
-            checker++;
-      
-          })
+            .collection("users")
+            .doc(userStatus.uid)
+            .set({
+              credits: userInfo.credits - 1
+            })
+            .then(respo => {
+              checker++;
+            });
         })
         .catch(Err => console.log(Err));
     }
 
-    if(togglePlag){
-      await axios.post('http://localhost:5000/api/plagiarism', obj)
+    if (togglePlag) {
+      await axios
+        .post("http://localhost:5000/api/plagiarism", obj)
         .then(res => {
-
           firestore
-          .collection('users')
-          .doc(userStatus.uid)
-          .set({
-            credits: userInfo.credits - 1
-          })
-          .then(respo => {
-            // res.data.sources.map(item => {
+            .collection("users")
+            .doc(userStatus.uid)
+            .set({
+              credits: userInfo.credits - 1
+            })
+            .then(respo => {
+              // res.data.sources.map(item => {
               checker++;
-              const response = JSON.parse(res.data)
+              const response = JSON.parse(res.data);
               setPlagiarismPlaces(response);
               console.log(response);
-    setChecked(true);
-      
-          })
-          
+              setChecked(true);
+            });
         });
     }
     setValue(obj.value);
     setChecking(false);
-    setCountCredits(countCredits - checker)
+    setCountCredits(countCredits - checker);
   };
-
-
 
   const handleChange = e => {
     e.preventDefault();
@@ -169,164 +162,198 @@ console.log('its still runnning');
     auth.signOut();
   };
 
-  const handleTogglePlagiarism  = () => {
-    if(togglePlag)
-      setTogglePlag(false);
-    else
-      setTogglePlag(true);
-  }
+  const handleTogglePlagiarism = () => {
+    if (togglePlag) setTogglePlag(false);
+    else setTogglePlag(true);
+  };
 
   const handleToggleSpelling = () => {
-    if(toggleSpell)
-    setToggleSpell(false);
-  else
-    setToggleSpell(true);
-  }
+    if (toggleSpell) setToggleSpell(false);
+    else setToggleSpell(true);
+  };
 
   const handleToggleRewriter = () => {
-    if(toggleRewriter)
-    setToggleRewriter(false);
-  else
-    setToggleRewriter(true);
+    if (toggleRewriter) setToggleRewriter(false);
+    else setToggleRewriter(true);
+  };
+
+  function onChange(value) {
+    console.log("Captcha value:", value);
   }
 
   return (
     <>
-    {pageLoading ? <>
-
-<div class="loadingio-spinner-rolling-bp0uc8kphr6"><div class="ldio-v9q6rtgt8o">
-<div></div>
-</div></div>
-
-</>:<>
-{redirect ? (
-        <Redirect to="/signin" />
+      {pageLoading ? (
+        <>
+          <div class="loadingio-spinner-rolling-bp0uc8kphr6">
+            <div class="ldio-v9q6rtgt8o">
+              <div></div>
+            </div>
+          </div>
+        </>
       ) : (
         <>
-      
-            <HomeNav />
- 
-          {/* <div className="background-home" >
-          </div> */} 
+          {redirect ? (
+            <Redirect to="/signin" />
+          ) : (
+            <>
+              {width > 500 ? <HomeNav /> : <MobileHomeNAv />}
 
-          <div className="form-group container container-width">
-            <div className="row">
-<div className="col col-sm-12">
+              {/* <div className="background-home" >
+          </div> */}
 
-            <div>
-            <div className="tag-saucy">
-            
-            <p className={wordsLength > 5000 ? "text-danger" : ""}>
-              Characters: {wordsLength}
-            </p>
-          </div>
-        
-          </div>
-          <div className="position-style">
-            <textarea
-              value={value}
-              onChange={handleChange}
-              className="form-control position-change"
-              rows="15"
-              id="text"
-            ></textarea>
-            </div>
-    
-        
-            </div>
-    
-          </div>
-          </div>
-
-
-<div className="container">
-<button onClick={handleToggleRewriter} class={"btn btn-lg  col-sm-4 p-3 rounded-5" + (toggleRewriter ? " btn-success" : " btn-primary")}>Rewiter</button>
-<button onClick={handleTogglePlagiarism} class={"btn btn-lg col-sm-4 p-3 rounded-5" + (togglePlag ? " btn-success" : " btn-primary")}>Plagiarism</button>
-<button onClick={handleToggleSpelling} class={"btn btn-lg col-sm-4 p-3 rounded-5" + (toggleSpell ? " btn-success" : " btn-primary")}>Spelling and Grammar</button>
-</div>
-<div className="container text-center font-color">
-  <button 
-
-onClick={handleSubmit}
-className={
-  "btn btn-lg col-sm-4 p-3 mt-1 rounded-5 " +
-  (wordsLength > 5000 || checking ? "btn-danger disabled" : "btn-primary") + (countCredits == 0 ? " disabled": " ")
-}
->
-{
-    countCredits == 0 ? <>
-    Kindly add more credits
-    </>: <>
-    {wordsLength > 5000 ? <>Reduce Chars To 5000</> : <>{checking ? <>Please Wait</>:<>Check</>}</>} - {countCredits}    
-    </>
-}  </button>
-</div>
-
-            
-          <br />
-          <br />
-
-
-          {
-plagiarismPlaces.plagPercent == "0" ? 
-  <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">No Plagiarism found </div>
-
-:<></>}
-{
-checked && plagiarismPlaces.plagPercent != "0"? <>
-  <div class="row">
-  <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">Plagiarism Detected </div>
-<div className="col col-lg-2 bg-warning text-center text-dark p-3">{plagiarismPlaces.plagPercent}% {plagiarismPlaces.uniquePercent == "100" ? <>0%</>:<></>}</div>
-</div>
-<div class="box">
-    <div class="container">
-     	<div class="row">
-			 {plagiarismPlaces.details.map((item, index) => {
-
-        return(
-          <>
-          {item.unique == "false" ? 
-              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 pt-3">
-              <div class="box-part text-center border-top border-bottom-3 mt-3">
-                            
-                            
-                <p class="text p-2">
-                - {item.query}
-                </p>
-                            
-                <div class="bg-danger p-2">
-                <a target="_blank" href={item.display.url} class="text-light">Check Similar Content</a>
+              <div className="form-group container container-width">
+                <div className="row">
+                  <div className="col col-sm-12">
+                    <div>
+                      <div className="tag-saucy">
+                        <p className={wordsLength > 5000 ? "text-danger" : ""}>
+                          Characters: {wordsLength}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="position-style">
+                      <textarea
+                        value={value}
+                        onChange={handleChange}
+                        className="form-control position-change"
+                        rows="15"
+                        id="text"
+                      ></textarea>
+                    </div>
+                  </div>
                 </div>
-                            
-                            
-               </div>
-            </div>	: <></>}
-          </>
-      
-        );
+              </div>
 
-       })}
- 
-				
-		</div>		
-    </div>
-</div>
-        
+              <div className="container">
+                <button
+                  onClick={handleToggleRewriter}
+                  class={
+                    "btn btn-lg  col-sm-4 p-3 rounded-5" +
+                    (toggleRewriter ? " btn-success" : " btn-primary")
+                  }
+                >
+                  Rewiter
+                </button>
+                <button
+                  onClick={handleTogglePlagiarism}
+                  class={
+                    "btn btn-lg col-sm-4 p-3 rounded-5" +
+                    (togglePlag ? " btn-success" : " btn-primary")
+                  }
+                >
+                  Plagiarism
+                </button>
+                <button
+                  onClick={handleToggleSpelling}
+                  class={
+                    "btn btn-lg col-sm-4 p-3 rounded-5" +
+                    (toggleSpell ? " btn-success" : " btn-primary")
+                  }
+                >
+                  Spelling and Grammar
+                </button>
+              </div>
+              <div className="container text-center font-color">
+                <button
+                  onClick={handleSubmit}
+                  className={
+                    "btn btn-lg col-sm-4 p-3 mt-1 rounded-5 " +
+                    (wordsLength > 5000 || checking
+                      ? "btn-danger disabled"
+                      : "btn-primary") +
+                    (countCredits == 0 ? " disabled" : " ")
+                  }
+                >
+                  {countCredits == 0 ? (
+                    <>Kindly add more credits</>
+                  ) : (
+                    <>
+                      {wordsLength > 5000 ? (
+                        <>Reduce Chars To 5000</>
+                      ) : (
+                        <>{checking ? <>Please Wait</> : <>Check</>}</>
+                      )}{" "}
+                      - {countCredits}
+                    </>
+                  )}{" "}
+                </button>
+                { userInfo.recaptcha ? 
+  <div class="padding-customized-plag">
+  <ReCAPTCHA
+    sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
+    onChange={onChange}
+  />
+  </div> :<></>
+}
+              </div>
 
-</>:<>
-</>}
-          <br />
-          <br />
-         
+              <br />
+              <br />
+
+              {plagiarismPlaces.plagPercent == "0" ? (
+                <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">
+                  No Plagiarism found{" "}
+                </div>
+              ) : (
+                <></>
+              )}
+              {checked && plagiarismPlaces.plagPercent != "0" ? (
+                <>
+                  <div class="row">
+                    <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">
+                      Plagiarism Detected{" "}
+                    </div>
+                    <div className="col col-lg-2 bg-warning text-center text-dark p-3">
+                      {plagiarismPlaces.plagPercent}%{" "}
+                      {plagiarismPlaces.uniquePercent == "100" ? (
+                        <>0%</>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </div>
+                  <div class="box">
+                    <div class="container">
+                      <div class="row">
+                        {plagiarismPlaces.details.map((item, index) => {
+                          return (
+                            <>
+                              {item.unique == "false" ? (
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 pt-3">
+                                  <div class="box-part text-center border-top border-bottom-3 mt-3">
+                                    <p class="text p-2">- {item.query}</p>
+
+                                    <div class="bg-danger p-2">
+                                      <a
+                                        target="_blank"
+                                        href={item.display.url}
+                                        class="text-light"
+                                      >
+                                        Check Similar Content
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+                            </>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
+              <br />
+              <br />
+            </>
+          )}
         </>
       )}
-
-
-</>}
-
-
-
-
     </>
   );
 }

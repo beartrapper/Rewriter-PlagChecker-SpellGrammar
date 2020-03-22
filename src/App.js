@@ -7,6 +7,9 @@ import LandingPage from "./Components/LandingPage/LandingPage";
 import PlagiarismChecker from "./Components/PlagiarismChecker/PlagiarismChecker";
 import SpellingAndGrammar from "./Components/SpellingAndGrammar/SpellingAndGrammar";
 import Rewiter from "./Components/Rewriter/Rewriter";
+import Example from "./Components/Checkout/Checkout";
+import CheckoutProfile from "./Components/Checkout/CheckoutProfile";
+import Upgrade from "./Components/Upgrade/Upgrade";
 
 function App() {
   return (
@@ -18,7 +21,10 @@ function App() {
           <Route path="/spelling" component={SpellingAndGrammar} exact />
           <Route path="/rewriter" component={Rewiter} exact />
           <Route path="/signin" component={SignIn} />
-          <Route path="/" component={LandingPage} exact/>
+          <Route path="/" component={LandingPage} exact />
+          <Route path="/checkout" component={Example} exact />
+          <Route path="/upgrade" component={Upgrade} exact />
+          <Route path="/checkout/profile" component={CheckoutProfile} exact />
         </Switch>
       </Router>
     </>
@@ -26,7 +32,3 @@ function App() {
 }
 
 export default App;
-
-
-
-

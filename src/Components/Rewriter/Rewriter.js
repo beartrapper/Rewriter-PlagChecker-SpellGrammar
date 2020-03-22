@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
 import MobileHomeNAv from "../Nav/MobileHomeNav";
+import ReCAPTCHA from "react-google-recaptcha";
 
 
 function Rewiter() {
@@ -156,6 +157,11 @@ function Rewiter() {
     auth.signOut();
   };
 
+  function onChange(value) {
+    console.log("Captcha value:", value);
+  }
+
+
   return (
     <>
 
@@ -233,6 +239,14 @@ className={
     </>
 }
 </button>
+{ userInfo.recaptcha ? 
+  <div class="padding-customized-plag">
+  <ReCAPTCHA
+    sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
+    onChange={onChange}
+  />
+  </div> :<></>
+}
 </div>
   <div className="container pt-5">
 

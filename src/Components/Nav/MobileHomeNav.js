@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function MobileHomeNAv(){
     return(
@@ -11,12 +12,28 @@ function MobileHomeNAv(){
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="/">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
+        <Link to="/plagiarism">
+        <a class="nav-link" href="#">Plgiarism Checker</a>
+        </Link>
       </li>
-    
+      <li class="nav-item">
+        <Link to="/plagiarism">
+        <a class="nav-link" href="#">Rewriter</a>
+        </Link>
+      </li>
+      <li class="nav-item">
+        <Link to="/plagiarism">
+        <a class="nav-link" href="#">Grammar and spelling</a>
+        </Link>
+      </li>
+      <li class="nav-item">
+        <Link to="/upgrade">
+        <a class="nav-link" href="#">Buy more credits</a>
+        </Link>
+      </li>
     
     </ul>
  

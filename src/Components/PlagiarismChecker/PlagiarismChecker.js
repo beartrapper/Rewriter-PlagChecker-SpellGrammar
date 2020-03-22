@@ -187,6 +187,7 @@ function PlagiarismChecker() {
 <button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Spelling and Grammar</button>
 </div> */}
 <div className="container text-center font-color">
+  <div className="col">
   <button 
 
 onClick={handlePlagiarism}
@@ -204,12 +205,15 @@ className={
 }
 
   </button>
-  {/* <div class="ml-5 pl-5 text-center">
+  { userInfo.recaptcha ? 
+  <div class="padding-customized-plag">
   <ReCAPTCHA
     sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
     onChange={onChange}
   />
-  </div> */}
+  </div> :<></>
+}
+  </div>
 
 </div>
 <br />
@@ -217,7 +221,7 @@ className={
 <br />
 <br />
 
-
+{/* <button onClick={handleLogout} className="btn btn-primary">logout</button> */}
 {
 plagiarismPlaces.plagPercent == "0" ? 
   <div className="col col-lg-10 bg-danger text-center text-light p-3 pl-5">No Plagiarism found </div>

@@ -3,6 +3,8 @@ import { auth, firestore } from "../../firebase";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 function SpellingAndGrammar() {
   const [userStatus, setUserStatus] = useState(null);
@@ -49,6 +51,11 @@ function SpellingAndGrammar() {
       }
     });
   }, [userStatus]);
+  
+  function onChange(value) {
+    console.log("Captcha value:", value);
+  }
+
 
   const onSubmit = async e => {
     e.preventDefault();
@@ -142,9 +149,6 @@ function SpellingAndGrammar() {
         <>
         
             <HomeNav />
- 
-          {/* <div className="background-home" >
-          </div> */} 
 
           <div className="form-group container container-width">
             <div className="row">
@@ -193,6 +197,14 @@ className={
     </>
 }
   </button>
+  { userInfo.recaptcha ? 
+  <div class="padding-customized-plag">
+  <ReCAPTCHA
+    sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
+    onChange={onChange}
+  />
+  </div> :<></>
+}
 </div>
             
 

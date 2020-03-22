@@ -37,7 +37,8 @@ function FirstSection () {
             .collection("users")
             .doc(res.user.uid)
             .set({
-              credits: 50
+              credits: 50,
+              recaptcha: true
             }).then(() => {
               auth.signOut().then(() => console.log('logged out')).catch(() => console.log('err while logging out'))
             }).catch(err => console.log('error updating firestore'))
