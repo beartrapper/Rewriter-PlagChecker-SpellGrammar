@@ -97,11 +97,11 @@ app.post("/api/plagiarism", (req, res) => {
 // Serve static assets in production
 
 // Set static folder
-// app.use(express.static("../build"));
+app.use(express.static("../build"));
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve(__dirname, "..", "build", "index.html"));
-// });
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "..", "build", "index.html"));
+});
 
 const port = 5000;
 
