@@ -11,6 +11,7 @@ function SignIn() {
   const [checkLoading, setCheckLoading] = useState(false);
 
   useEffect(() => {
+
     auth.onAuthStateChanged(user => {
       if (user != null) {
         setRedirect(true);
@@ -49,7 +50,7 @@ function SignIn() {
   return (
     <>
       {redirect ? (
-        <Redirect to="/home" />
+        <Redirect to="/rewriter" />
       ) : (
         <>
           <div className="body">

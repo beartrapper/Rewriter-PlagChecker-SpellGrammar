@@ -30,7 +30,7 @@ class Example extends React.Component {
 
     const paypalOptions = {
       clientId:
-        "AUO4Sg6waZAdAAlrYuxZOqeO-27bL6WsKSdcVUcK2k-md1gK8EqBdv1Mc4ro2sU-LZbLUllFnyuBoe11",
+        "AeadRMQGqULnuDFojUvP1cYRYP6NzCuPfctyMg-sb47wqCR48wdTeUoFhcULCoNkwuhHFc-pHGkJYLJb",
       intent: "capture"
     };
 
@@ -46,16 +46,16 @@ class Example extends React.Component {
       </div>
       
     :<>
-       <div className="">
-          <div className="posi">
+       <div className="paypal-button">
+       <div>
             <img
               src="images/undraw_investing_7u74.svg"
               alt="Image"
-              class="img-fluid img-absolute posi"
+              class="custom-sizing-bg-image"
             />
           </div>
         </div>
-        <div className="padding-customized" onClick={this.handleChange}>
+        <div  onClick={this.handleChange}>
           {this.state.paid ? (
             <div className="alert alert-success">
               <p>Login credentials sent via Email address</p>
@@ -78,7 +78,7 @@ class Example extends React.Component {
           ) : (
             <></>
           )}
-
+<div className="container pt-5 paypal-button" >
           <PayPalButton
             paypalOptions={paypalOptions}
             // buttonStyles={buttonStyles}
@@ -149,6 +149,7 @@ class Example extends React.Component {
               console.log(response);
             }}
           />
+          </div>
         </div>
     
     </>}

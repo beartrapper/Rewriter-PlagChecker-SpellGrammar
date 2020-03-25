@@ -5,6 +5,7 @@ import { firestore, auth } from "../../firebase";
 import emailjs from "emailjs-com";
 import * as generator from "generate-password";
 import Nav from "../Nav/Nav";
+import SimpleNav from "../Nav/SimpleNav";
 
 class CheckoutProfile extends React.Component {
   state = {
@@ -55,18 +56,10 @@ class CheckoutProfile extends React.Component {
       
     :
     <>
-        <Nav />
+        <SimpleNav />
 
-       <div className="">
-          <div className="posi">
-            {/* <img
-              src="images/undraw_investing_7u74.svg"
-              alt="Image"
-              class="img-fluid img-absolute posi"
-            /> */}
-          </div>
-        </div>
-        <div className="padding-customized" onClick={this.handleChange}>
+    
+        <div className="paypal-button" onClick={this.handleChange}>
           {this.state.paid ? (
             <div className="alert alert-success">
               <p>Login credentials sent via Email address</p>

@@ -25,6 +25,7 @@ function App() {
           <Route path="/checkout" component={Example} exact />
           <Route path="/upgrade" component={Upgrade} exact />
           <Route path="/checkout/profile" component={CheckoutProfile} exact />
+          <Route path="/account" component={Upgrade} exact />
         </Switch>
       </Router>
     </>

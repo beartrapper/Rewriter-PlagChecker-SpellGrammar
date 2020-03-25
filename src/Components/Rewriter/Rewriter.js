@@ -5,6 +5,7 @@ import axios from "axios";
 import HomeNav from "../Nav/HomeNav";
 import MobileHomeNAv from "../Nav/MobileHomeNav";
 import ReCAPTCHA from "react-google-recaptcha";
+import SimpleNav from "../Nav/SimpleNav";
 
 
 function Rewiter() {
@@ -24,6 +25,8 @@ function Rewiter() {
   const [checked, setChecked] = useState(false);
   const [checking, setChecking] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [valueForReset, setValueForReset] = useState('');
+  const [lastValue, setLastValue] = useState('');
 
 
   useEffect(() => {
@@ -60,15 +63,17 @@ function Rewiter() {
   const handleRewrite = async e => {
     e.preventDefault();
     setChecking(true);
-
+    console.log(uniqueness);
     let ignoredToBeSent = [];
     let tempValue;
     if (wordsLength < 5000) {
+
+      let tempValueForTesting = "";
       for (let count = 0; count < uniqueness; count++) {
         if (count != 0) {
           await axios({
             method: "post", //you can set what request you want to be
-            url: "https://contentrewriter.com:5000/api/rewrite",
+            url: "http://178.128.47.78:5000/api/rewrite",
             data: { value: tempValue, words: ignoreWords}
           })
             .then(res => {
@@ -80,7 +85,7 @@ function Rewiter() {
         } else {
           await axios({
             method: "post", //you can set what request you want to be
-            url: "https://contentrewriter.com:5000/api/rewrite",
+            url: "http://178.128.47.78:5000/api/rewrite",
             data: { value: value, words: ignoreWords }
           })
             .then(res => {
@@ -91,9 +96,44 @@ function Rewiter() {
             })
             .catch(err => console.log(err));
         }
-      }
+      };
 
-      setCountCredits(countCredits - 1)
+      const obj = {
+        value
+      };
+
+
+      axios.post('http://178.128.47.78:5000/api/spell', obj)
+        .then(resp => {
+          const obj2 = {
+            value: resp.data
+          }
+          axios.post('http://178.128.47.78:5000/api/plagiarism', obj2)
+          .then(res => {
+            
+            const response = JSON.parse(res.data);
+            let plagPercent = ''
+            // let plagPercent = response.plagPercent + '% plagiarism \n\n';
+            plagPercent = plagPercent + resp.data;
+            setLastValue(plagPercent);
+        setChecking(false);
+        setCountCredits(countCredits - 1)
+          }).catch(err => {
+      setChecking(false);
+            
+            console.log(err)
+          })
+  
+
+
+        })
+        .catch(err => {
+      setChecking(false);
+          
+          console.log(err)})
+
+
+
       firestore
       .collection('users')
       .doc(userStatus.uid)
@@ -107,7 +147,6 @@ function Rewiter() {
           
   
       });
-      setChecking(false);
 
 
 
@@ -126,6 +165,7 @@ function Rewiter() {
   const handleChange = e => {
     e.preventDefault();
     setValue(e.target.value);
+    setValueForReset(e.target.value);
     function WordCount(str) {
       // const wordsLength = str.split(" ").filter(function(n) {
       //   return n != "";
@@ -161,6 +201,11 @@ function Rewiter() {
     console.log("Captcha value:", value);
   }
 
+  const handleReset = e => {
+    setValue('');
+    setValueForReset('');
+    setLastValue('');
+  }
 
   return (
     <>
@@ -178,15 +223,96 @@ function Rewiter() {
       ) : (
         <>
       
-         {width > 500 ?
-            <HomeNav />
-:
-<MobileHomeNAv />
-}
- 
-          {/* <div className="background-home" >
-          </div> */} 
+       <SimpleNav />
+       
+       <div className="text-center text-dark pt-4 mt-4">
+          <h2>
+            Premium Article Rewriter
+          </h2>
+          <h5>
+            You have {countCredits} credits remaining.
+          </h5>
+          <h5 className={wordsLength > 5000 ? "text-danger" : ""}>
+            Characters length: {wordsLength}
+          </h5>
+        </div>
+<div className="container pt-5 mt-5">
+        <div className="row">
+        <div class="col-lg-6">
+    <div class="form-group text-center">
+      <textarea 
+      value={valueForReset}
+      className="form-control" 
+      rows="13"
+      onChange={handleChange}
+      ></textarea>
+      <button 
+      onClick={handleRewrite}
+      className={"btn btn-primary mt-3" + (checking || wordsLength > 5000 || countCredits ==0? " disabled" : "")}>{checking ? "Rewriting" : <>{countCredits == 0 ? "Out of Credits" : "Rewrite"} </>}</button>
+    </div>
+  </div>
+  <div className="col-lg-6">
+    <div className="form-group text-center">
+      <textarea 
+      value={lastValue}
+      className="form-control" rows="13">
+      
+      </textarea>
+      <button 
+      onClick={handleReset}
+      className="btn btn-primary mt-3">Reset</button>
 
+    </div>
+  </div>
+        </div>
+   { userInfo.recaptcha ? 
+  <div class="padding-customized-plag">
+  <ReCAPTCHA
+    sitekey="6Le9W-IUAAAAAHnwDZmrlXBQTFaQIRIfU3YvrYvA"
+    onChange={onChange}
+  />
+  </div> :<></>
+}
+        </div>
+     
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/* 
           <div className="form-group container container-width">
             <div className="row">
 <div className="col col-sm-12">
@@ -215,14 +341,14 @@ function Rewiter() {
     
           </div>
           </div>
-
+ */}
 
 {/* <div className="container">
 <button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Rewiter</button>
 <button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Plagiarism</button>
 <button class="btn btn-lg btn-primary col-sm-4 p-3 rounded-5">Spelling and Grammar</button>
 </div> */}
-<div className="container text-center font-color">
+{/* <div className="container text-center font-color">
   <button 
 
 onClick={handleRewrite}
@@ -248,6 +374,10 @@ className={
   </div> :<></>
 }
 </div>
+  
+   */}
+  
+  
   <div className="container pt-5">
 
             <div  className="row">
@@ -294,6 +424,7 @@ className={
           <br />
           <br />
           <br />
+          <button onClick={handleLogout} className="col col-sm-12 btn btn-danger">Logout</button>
           {/* <div className="form-group">
             <label for="comment">Cleansed:</label>
             <textarea
